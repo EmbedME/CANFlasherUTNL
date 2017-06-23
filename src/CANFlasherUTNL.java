@@ -4,7 +4,7 @@
  * through an USBtin (USB-to-CAN interface).
  * http://www.fischl.de/can/bootloader/canflasherutnl/
  *
- * Copyright (C) 2016  Thomas Fischl 
+ * Copyright (C) 2016-2017  Thomas Fischl 
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ public class CANFlasherUTNL extends javax.swing.JFrame implements LPCFlashListen
         Preferences prefs = Preferences.userNodeForPackage(CANFlasherUTNL.class);
         serialPort.setSelectedItem(prefs.get("PORT", "COM1"));
         fileNameField.setText(prefs.get("FILENAME", ""));
-        
+        executionAddressField.setText(prefs.get("EXECUTIONADDRESS", "0x200"));
     }
 
     /**
@@ -75,6 +75,7 @@ public class CANFlasherUTNL extends javax.swing.JFrame implements LPCFlashListen
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        goModeGroup = new javax.swing.ButtonGroup();
         serialPort = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -83,9 +84,14 @@ public class CANFlasherUTNL extends javax.swing.JFrame implements LPCFlashListen
         uploadButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         logTextArea = new javax.swing.JTextArea();
+        jLabel3 = new javax.swing.JLabel();
+        goModeNo = new javax.swing.JRadioButton();
+        goModeJump = new javax.swing.JRadioButton();
+        goModeInsertReset = new javax.swing.JRadioButton();
+        executionAddressField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("CANFlasherUTNL v1.0");
+        setTitle("CANFlasherUTNL v1.1");
 
         serialPort.setModel(new javax.swing.DefaultComboBoxModel(SerialPortList.getPortNames()));
 
@@ -113,6 +119,20 @@ public class CANFlasherUTNL extends javax.swing.JFrame implements LPCFlashListen
         logTextArea.setText("CANFlahserUTNL is a flash utility for NXP LPC11C22/24 devices.\nIt writes HEX files via the built-in CAN bootloader to the target flash \nthrough an USB-to-CAN interface USBtin.\n\nUsage:\n1. Plugin USBtin (USB-to-CAN interface)\n2. Start this tool, select port and HEX file name\n3. Power up LPC with mode pins set for CAN bootloading\n4. Press \"Upload\" to start firmware upload");
         jScrollPane1.setViewportView(logTextArea);
 
+        jLabel3.setText("Code jump");
+
+        goModeGroup.add(goModeNo);
+        goModeNo.setSelected(true);
+        goModeNo.setText("None");
+
+        goModeGroup.add(goModeJump);
+        goModeJump.setText("Goto:");
+
+        goModeGroup.add(goModeInsertReset);
+        goModeInsertReset.setText("Insert reset");
+
+        executionAddressField.setText("0x200");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -120,20 +140,27 @@ public class CANFlasherUTNL extends javax.swing.JFrame implements LPCFlashListen
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 459, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
-                            .addComponent(jLabel1))
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel3))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(serialPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(fileNameField)
+                                .addComponent(fileNameField, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(filebrowseButton))))
+                                .addComponent(filebrowseButton))
+                            .addComponent(serialPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(goModeNo)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(goModeJump)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(executionAddressField, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(goModeInsertReset))))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(uploadButton)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -152,9 +179,17 @@ public class CANFlasherUTNL extends javax.swing.JFrame implements LPCFlashListen
                     .addComponent(fileNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(filebrowseButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(goModeNo)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel3)
+                        .addComponent(goModeJump)
+                        .addComponent(executionAddressField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(goModeInsertReset)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(uploadButton)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -193,12 +228,28 @@ public class CANFlasherUTNL extends javax.swing.JFrame implements LPCFlashListen
         Preferences prefs = Preferences.userNodeForPackage(CANFlasherUTNL.class);
         prefs.put("PORT", (String)serialPort.getSelectedItem());
         prefs.put("FILENAME", (String)fileNameField.getText());
+        prefs.put("EXECUTIONADDRESS", (String)executionAddressField.getText());
                 
         // run flash engine within new thread
         new Thread(new Runnable() {                                    
             public void run() {
               uploadButton.setEnabled(false);
-              lpcflash.flash(serialPort.getSelectedItem().toString(), fileNameField.getText());
+              
+              LPCFlash.GoMode gomode = LPCFlash.GoMode.NO;
+              int address = 0;
+              
+              if (goModeJump.isSelected()) {
+                  gomode = LPCFlash.GoMode.ADDRESS;
+                  if (executionAddressField.getText().substring(0, 2).equals("0x")) {
+                      address = Integer.parseInt(executionAddressField.getText().substring(2), 16);
+                  } else {
+                      address = Integer.parseInt(executionAddressField.getText());
+                  }
+              } else if (goModeInsertReset.isSelected()) {
+                  gomode = LPCFlash.GoMode.INSERTRESET;
+              }
+              
+              lpcflash.flash(serialPort.getSelectedItem().toString(), fileNameField.getText(), gomode, address);
               uploadButton.setEnabled(true);
 
             }
@@ -241,10 +292,16 @@ public class CANFlasherUTNL extends javax.swing.JFrame implements LPCFlashListen
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField executionAddressField;
     private javax.swing.JTextField fileNameField;
     private javax.swing.JButton filebrowseButton;
+    private javax.swing.ButtonGroup goModeGroup;
+    private javax.swing.JRadioButton goModeInsertReset;
+    private javax.swing.JRadioButton goModeJump;
+    private javax.swing.JRadioButton goModeNo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea logTextArea;
     private javax.swing.JComboBox serialPort;

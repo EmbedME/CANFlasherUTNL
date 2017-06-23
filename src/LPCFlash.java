@@ -2,7 +2,7 @@
  * Part of CANFlasherUTNL - Flash tool for NXP LPC11C22/24 devices.
  * http://www.fischl.de/can/bootloader/canflasherutnl/
  *
- * Copyright (C) 2016  Thomas Fischl 
+ * Copyright (C) 2016-2017  Thomas Fischl 
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +57,11 @@ public class LPCFlash {
     public static final int OBJ_SUB_EXECUTION_ADDRESS = 0x01;
     public static final int OBJ_SUB_MODE = 0x02;
     public static final int OBJ_IDX_SERIAL_NUMBER = 0x5100;
-        
+    
+    public enum GoMode {
+        NO, ADDRESS, INSERTRESET
+    }    
+    
     /** List of listeners */
     protected ArrayList<LPCFlashListener> listeners = new ArrayList<LPCFlashListener>();
     
@@ -95,8 +99,10 @@ public class LPCFlash {
      * 
      * @param usbtinPort Port of USBtin
      * @param hexfile Filename of HEX
+     * @param gomode Type of GO command after flash process
+     * @param executionAddress Address to jump to
      */
-    public void flash(String usbtinPort, String hexfile) {
+    public void flash(String usbtinPort, String hexfile, GoMode gomode, int executionAddress) {
 
         USBtinSDO usbtinSDO = new USBtinSDO();
         
@@ -109,8 +115,26 @@ public class LPCFlash {
             HexParser.read(new FileReader(hexfile), dm);
 
             outputMessage("range: " + dm.getWroteMin() + "-" + dm.getWroteMax() + " (sectors " +  dm.getWroteSectorMin() + "-" + dm.getWroteSectorMax() + ")\n");
-                       
+            
+            if (gomode == GoMode.INSERTRESET) {
+            
+                byte resetSequence[] = new byte[]{(byte)0xBF, (byte)0xF3, (byte)0x4F, (byte)0x8F, (byte)0x02, (byte)0x4A, (byte)0x03, (byte)0x4B, (byte)0xDA, (byte)0x60, (byte)0xBF, (byte)0xF3, (byte)0x4F, (byte)0x8F, (byte)0xFE, (byte)0xE7, (byte)0x04, (byte)0x00, (byte)0xFA, (byte)0x05, (byte)0x00, (byte)0xED, (byte)0x00, (byte)0xE0};
+                int resetAddress = dm.getWroteMax();
+                if (resetAddress < 0x200) resetAddress = 0x200;
+                resetAddress = resetAddress + (4 - resetAddress % 4); // alignment
+                executionAddress = resetAddress;
+                
+                outputMessage("Place reset function at 0x" + String.format("%X", resetAddress) + "... ");
+
+                for (int i = 0; i < resetSequence.length; i++) {
+                    dm.writeMemoryData(resetAddress + i, resetSequence[i]);
+                }
+                
+                outputMessage("new range: " + dm.getWroteMin() + "-" + dm.getWroteMax() + " (sectors " +  dm.getWroteSectorMin() + "-" + dm.getWroteSectorMax() + ")\n");
+            }
+
             dm.insertChecksum();
+
             
             outputMessage("Open USBtin... ");
 
@@ -188,10 +212,16 @@ public class LPCFlash {
                         
             }
             
-            // TODO: start app
-            // TODO: >067d,23,70,50,01,00,10,00,00 write execution add 0x00001000
-            // TODO: >067d,2f,51,1f,01,01,00,00,00 write program control 0x01
-            
+            if (gomode != GoMode.NO) {
+                outputMessage("GO to 0x" + String.format("%X", executionAddress) + " ...\n");
+                usbtinSDO.writeExpedited(OBJ_IDX_EXECUTION_ADDRESS, OBJ_SUB_EXECUTION_ADDRESS, new byte[]{
+                        (byte)(executionAddress & 0xff),
+                        (byte)((executionAddress >> 8) & 0xff),
+                        (byte)((executionAddress >> 16) & 0xff),
+                        (byte)((executionAddress >> 24) & 0xff)});
+                usbtinSDO.writeExpedited(OBJ_IDX_PROGRAM_CONTROL, OBJ_SUB_PROGRAM_CONTROL, new byte[]{0x01}); // write program control 0x01                
+            }
+
             
             // close the CAN channel and close the connection
             usbtinSDO.closeCANChannel();
