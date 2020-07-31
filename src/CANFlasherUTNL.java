@@ -91,7 +91,7 @@ public class CANFlasherUTNL extends javax.swing.JFrame implements LPCFlashListen
         executionAddressField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("CANFlasherUTNL v1.1");
+        setTitle("CANFlasherUTNL v1.1.1");
 
         serialPort.setModel(new javax.swing.DefaultComboBoxModel(SerialPortList.getPortNames()));
 

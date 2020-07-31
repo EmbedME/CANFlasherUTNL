@@ -13,7 +13,7 @@
     <path id="project.class.path">
         <pathelement path="${classpath}"/>
         <pathelement path="${build}"/>
-        <pathelement location="lib/jssc-2.8.0.jar"/>
+        <pathelement location="lib/jssc-2.9.1.jar"/>
         <pathelement location="lib/USBtinLib-1.2.0.jar"/>
     </path>
 
@@ -50,7 +50,7 @@
             <manifest>
                 <attribute name="Main-Class" value="CANFlasherUTNL"/>
             </manifest>
-            <zipfileset src="lib/jssc-2.8.0.jar"/>
+            <zipfileset src="lib/jssc-2.9.1.jar"/>
             <zipfileset src="lib/USBtinLib-1.2.0.jar"/>
         </jar>
     </target>
